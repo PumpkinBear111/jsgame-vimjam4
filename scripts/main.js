@@ -4,6 +4,7 @@ let draw_context = document.getElementById("gamecanvas")
 let width = draw_context.offsetWidth
 let height = draw_context.offsetHeight
 draw_context = draw_context.getContext("2d")
+draw_context.font = "30px Arial"
 
 class Graphic {
     constructor(name,scalex,scaley) {
@@ -41,11 +42,87 @@ class Graphic {
         draw_context.drawImage(this.img, x, y, this.scalex, this.scaley)
     }
 }
+class Entity extends Graphic {
+    constructor(image, tick, data, transform) {
+        super(image)
+        this.transform = {
+            "position": {
+                "x":-10000,
+                "y":-10000,
+            },
+            "rotation": 0,
+            "scale": {
+                "x":this.scalex,
+                "y":this.scaley,
+            }
+        }
+        if (typeof transform != "undefined") {
+            if (typeof transform.position.x != undefined) this.transform.position.x = transform.position.x
+            if (typeof transform.position.y != undefined) this.transform.position.y = transform.position.y
+            if (typeof transform.scale != undefined) {
+                if (typeof transform.scale.y == undefined) {
+                    this.scalex = transform.scale.x
+                    this.scaley = this.scalex
+                } else {
+                    this.scalex = transform.scale.x
+                    this.scaley = transform.scale.y
+                }
+            }
+            if (typeof transform.rotation != undefined) {
+                this.transform.rotation = transform.rotation
+            }
+        }
+        if (typeof data == "undefined") data = {}
+        this.data = data
+        this.tick = tick
+    }
+    move(x,y) {
+        this.transform.position = {
+            "x":this.transform.position.x+x,
+            "y":this.transform.position.y+y,
+        }
+    }
+    moveTo(x,y) {
+        this.transform.position = {
+            "x":x,
+            "y":y,
+        }
+    }
+    draw(x,y) {
+        if (!this.isLoaded()) {
+            return 1
+        }
+        let t = this.transform
+        draw_context.save()
+        draw_context.translate(t.position.x, t.position.y+t.scale.y/2)
+        draw_context.rotate(t.rotation*Math.PI/180.0)
+        draw_context.translate(-t.position.x, -t.position.y-t.scale.y/2)
+        draw_context.drawImage(this.img, x-this.scalex/2, y-this.scaley/2, this.scalex, this.scaley)
+        draw_context.restore()
+        if (debugMode) {
+            draw_context.fillStyle = "rgb(255,0,0)"
+            draw_context.fillRect(t.position.x-1,t.position.y-1,2,2)
+        }
+    }
+    update(dt) {
+        this.tick(dt, this)
+        if (this.scalex != this.transform.scale.x) this.transform.scale.x = this.scalex
+        if (this.scaley != this.transform.scale.y) this.transform.scaley = this.scaley
+        this.draw(this.transform.position.x,this.transform.position.y)
+    }
+}
 class Sound {
     constructor(name) {
         this.sfx = new Audio()
         if (name.includes("/")) this.sfx.src = name
         else this.sfx.src = "assets/sound/" + name
+        this.setAsSfx()
+    }
+    setAsMusic() {
+        this.sfx.loop = true
+    }
+    setAsSfx() {
+        this.sfx.loop = false
     }
     isLoaded() {
         return this.sfx.readyState === 4
@@ -73,25 +150,56 @@ class Sound {
     }
 }
 
-tmp = new Graphic("testimg.jpg", 255)
-let x = 0
-
 let lasttime = 0
 function update(time) {
     let dt = (time-lasttime)/1000
-    draw_context.fillStyle = "red"
+    draw_context.fillStyle = "rgb(200,200,255)"
     draw_context.fillRect(0,0,width,height)
-    tmp.draw(x,0)
+    
+    for (let entity of entities) {
+        entity.update(dt)
+    }
 
-    draw_context.fillStyle = "black"
-    draw_context.fillText(""+dt,50,100)
-    x += 100*dt
+    if (debugMode) {
+        draw_context.fillStyle = "black"
+        draw_context.fillText(Math.round(1/dt)+"fps",50,100)
+        draw_context.fillText(keysdown,50,150)
+    }
+    
     lasttime = time
     requestAnimationFrame(update)
 }
 requestAnimationFrame(update)
 
-document.onclick = function() {
-    let tmp1 = new Sound("BeepBox-Song.wav")
-    tmp1.playVariate()
+function processKey(key) {
+    key = key.toLowerCase()
+    switch(key) {
+        case " ":
+        case "w":
+        case "arrowup":
+            return Key.JUMP
+        case "a":
+        case "arrowleft":
+            return Key.LEFT
+        case "d":
+        case "arrowright":
+            return Key.RIGHT
+        case "s":
+        case "arrowdown":
+            return Key.DOWN
+    }
+    return key
+}
+function keydown(e) {
+    if (!keysdown.includes(processKey(e.key)))
+    keysdown.push(processKey(e.key))
+}
+function keyup(e) {
+    keysdown.splice(keysdown.indexOf(processKey(e.key)),1)
+}
+const Key = {
+    JUMP: "jump",
+    LEFT: "left",
+    DOWN: "down",
+    RIGHT: "right",
 }
