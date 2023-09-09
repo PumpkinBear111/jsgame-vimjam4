@@ -16,10 +16,13 @@ class Graphic {
             this.scalex = scalex
             if (scaley == undefined) {
                 this.scaley = scalex
-            }
+            } else this.scaley = scaley
         } else {
-            this.scalex = this.img.width
-            this.scaley = this.img.height
+            let a = this
+            this.img.onload = function() {
+                a.scalex = a.img.width
+                a.scaley = a.img.height
+            }
         }
     }
     isLoaded() {
@@ -45,11 +48,14 @@ class Graphic {
 }
 class Entity extends Graphic {
     constructor(image, tick, data, transform) {
-        super(image)
+        if (typeof transform.scale != "undefined") {
+            if (typeof transform.scale.y == 'undefined') super(image, transform.scale.x, transform.scale.x)
+            else super(image, transform.scale.x, transform.scale.x)
+        } else super(image)
         this.transform = {
             "position": {
-                "x":-10000,
-                "y":-10000,
+                "x":10000,
+                "y":10000,
             },
             "rotation": 0,
             "scale": {
@@ -63,7 +69,7 @@ class Entity extends Graphic {
             if (typeof transform.scale != 'undefined') {
                 if (typeof transform.scale.y == 'undefined') {
                     this.scalex = transform.scale.x
-                    this.scaley = this.scalex
+                    this.scaley = transform.scale.x
                 } else {
                     this.scalex = transform.scale.x
                     this.scaley = transform.scale.y
@@ -121,25 +127,57 @@ class Entity extends Graphic {
     update(dt) {
         this.tick(dt, this)
         if (this.scalex != this.transform.scale.x) this.transform.scale.x = this.scalex
-        if (this.scaley != this.transform.scale.y) this.transform.scaley = this.scaley
+        if (this.scaley != this.transform.scale.y) this.transform.scale.y = this.scaley
         this.draw(this.transform.position.x,this.transform.position.y)
     }
 }
-class Solid extends Graphic {
-    constructor(image, topleftlocation) {
-        super(image)
-        this.pos = topleftlocation
+class Solid extends Entity {
+    constructor (image, transform) {
+        super(image, undefined, undefined, transform)
     }
-
+    get boundl() {
+        return this.transform.position.x-this.scalex/2
+    }
+    get boundr() {
+        return this.transform.position.x+this.scalex/2
+    }
+    get boundd() {
+        return this.transform.position.y+this.scaley/2
+    }
+    get boundu() {
+        return this.transform.position.y-this.scaley/2
+    }
 }
 class PhysicsEntity extends Entity {
     constructor(image, tick, data, transform) {
         super(image, tick, data, transform)
         this.velocity = [0,0]
     }
+    move(x,y) {
+        let targetPosition = {
+            "x":this.transform.position.x+x,
+            "y":this.transform.position.y+y,
+        }
+        let myLeft = targetPosition.x-this.scalex/2
+        let myRight = targetPosition.x+this.scalex/2
+        let myDown = targetPosition.y+this.scaley/2
+        let myUp = targetPosition.y+this.scaley/2
+        for (let col of colliders) {
+            if (myRight < col.boundl || myLeft > col.boundr || myUp < col.boundd || myDown > col.boundu) {
+                if (myDown > col.boundu && (myLeft <= col.boundr && myRight >= col.boundl)) {
+                    targetPosition.y = col.boundu-this.scaley/2
+                    this.velocity[1] = 0
+                    console.log(this.velocity)
+                }
+                //this.velocity[0] = 0
+                //targetPosition.x = this.transform.position.x
+            }
+        }
+        this.transform.position = targetPosition
+    }
     update(dt) {
         this.tick(dt, this)
-        this.move(this.velocity[0],this.velocity[1]*dt)
+        this.move(this.velocity[0]*dt,this.velocity[1]*dt)
         if (this.scalex != this.transform.scale.x) this.transform.scale.x = this.scalex
         if (this.scaley != this.transform.scale.y) this.transform.scaley = this.scaley
         this.draw(this.transform.position.x,this.transform.position.y)
@@ -220,7 +258,7 @@ class Sound {
 
 let lasttime = 0
 
-let fps0 = 1
+let fps0 = 60
 let fps1 = 0
 function update(time) {
     let dt = (time-lasttime)/1000
@@ -230,12 +268,17 @@ function update(time) {
     for (let entity of entities) {
         entity.update(dt)
     }
+    for (let col of colliders) {
+        col.draw(col.transform.position.x,col.transform.position.y)
+    }
 
     if (debugMode) {
         draw_context.fillStyle = "black"
         draw_context.fillText(Math.round(1/dt)+"fps av("+fps0/fps1+")",50,100)
         draw_context.fillText(keysdown,50,150)
-        fps0+=Math.round(1/dt)
+        if (fps1 >= 2) {
+            fps0 += Math.round(1 / dt)
+        }
         fps1++
     }
     
