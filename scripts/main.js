@@ -5,6 +5,7 @@ let width = draw_context.offsetWidth
 let height = draw_context.offsetHeight
 draw_context = draw_context.getContext("2d")
 draw_context.font = "30px Arial"
+draw_context.imageSmoothingEnabled = false
 
 class Graphic {
     constructor(name,scalex,scaley) {
@@ -57,10 +58,10 @@ class Entity extends Graphic {
             }
         }
         if (typeof transform != "undefined") {
-            if (typeof transform.position.x != undefined) this.transform.position.x = transform.position.x
-            if (typeof transform.position.y != undefined) this.transform.position.y = transform.position.y
-            if (typeof transform.scale != undefined) {
-                if (typeof transform.scale.y == undefined) {
+            if (typeof transform.position.x != 'undefined') this.transform.position.x = transform.position.x
+            if (typeof transform.position.y != 'undefined') this.transform.position.y = transform.position.y
+            if (typeof transform.scale != 'undefined') {
+                if (typeof transform.scale.y == 'undefined') {
                     this.scalex = transform.scale.x
                     this.scaley = this.scalex
                 } else {
@@ -68,7 +69,7 @@ class Entity extends Graphic {
                     this.scaley = transform.scale.y
                 }
             }
-            if (typeof transform.rotation != undefined) {
+            if (typeof transform.rotation != 'undefined') {
                 this.transform.rotation = transform.rotation
             }
         }
@@ -89,13 +90,26 @@ class Entity extends Graphic {
         }
     }
     draw(x,y) {
+        if (this.transform.x+this.scalex/2 < 0) return 1
+        if (this.transform.y+this.scaley/2 < 0) return 1
+        if (this.transform.x-this.scalex/2 > width) return 1
+        if (this.transform.y-this.scaley/2 < height) return 1
+        if (Math.abs(this.transform.rotation)<rotationRounding) {
+            draw_context.drawImage(this.img, x-this.scalex/2, y-this.scaley/2, this.scalex, this.scaley)
+            if (debugMode) {
+                draw_context.fillStyle = "rgb(255,0,0)"
+                draw_context.fillRect(this.transform.position.x-1,this.transform.position.y-1,2,2)
+            } 
+            return 1
+        }
         if (!this.isLoaded()) {
             return 1
         }
         let t = this.transform
         draw_context.save()
         draw_context.translate(t.position.x, t.position.y+t.scale.y/2)
-        draw_context.rotate(t.rotation*Math.PI/180.0)
+        draw_context.rotate(
+            Math.round((t.rotation)/rotationRounding)*rotationRounding*Math.PI/180.0)
         draw_context.translate(-t.position.x, -t.position.y-t.scale.y/2)
         draw_context.drawImage(this.img, x-this.scalex/2, y-this.scaley/2, this.scalex, this.scaley)
         draw_context.restore()
@@ -110,6 +124,60 @@ class Entity extends Graphic {
         if (this.scaley != this.transform.scale.y) this.transform.scaley = this.scaley
         this.draw(this.transform.position.x,this.transform.position.y)
     }
+}
+class Solid extends Graphic {
+    constructor(image, topleftlocation) {
+        super(image)
+        this.pos = topleftlocation
+    }
+
+}
+class PhysicsEntity extends Entity {
+    constructor(image, tick, data, transform) {
+        super(image, tick, data, transform)
+        this.velocity = [0,0]
+    }
+    update(dt) {
+        this.tick(dt, this)
+        this.move(this.velocity[0],this.velocity[1]*dt)
+        if (this.scalex != this.transform.scale.x) this.transform.scale.x = this.scalex
+        if (this.scaley != this.transform.scale.y) this.transform.scaley = this.scaley
+        this.draw(this.transform.position.x,this.transform.position.y)
+    }
+}
+class GUI extends Entity {
+    constructor(uitype, transform, data) {
+        super("testimg.jpg", undefined, {}, transform)
+        this.uitype = uitype
+        this.shown = true
+        switch(this.uitype) {
+            case(UiType.LABEL): setText(data); break;
+            case(UiType.IMG_LABEL): setIcon(data); break;
+        }
+    }
+    show() {
+        this.shown = true
+    }
+    hide() {
+        this.shown = false
+    }
+    setIcon(src) {
+        this.img.src = src
+    }
+    setOnClick(todo) {
+        this.clickevent = todo
+    }
+    setText(txt) {
+        this.text = txt
+    }
+    draw() {
+        
+    }
+}
+const UiType = {
+    BUTTON: "btn",
+    LABEL: "text",
+    IMG_LABEL: "icon"
 }
 class Sound {
     constructor(name) {
@@ -151,6 +219,9 @@ class Sound {
 }
 
 let lasttime = 0
+
+let fps0 = 1
+let fps1 = 0
 function update(time) {
     let dt = (time-lasttime)/1000
     draw_context.fillStyle = "rgb(200,200,255)"
@@ -162,8 +233,10 @@ function update(time) {
 
     if (debugMode) {
         draw_context.fillStyle = "black"
-        draw_context.fillText(Math.round(1/dt)+"fps",50,100)
+        draw_context.fillText(Math.round(1/dt)+"fps av("+fps0/fps1+")",50,100)
         draw_context.fillText(keysdown,50,150)
+        fps0+=Math.round(1/dt)
+        fps1++
     }
     
     lasttime = time

@@ -1,4 +1,11 @@
 let keysdown = []
 let entities = []
+let colliders = []
 
-let debugMode = false
+let ui = []
+
+/*Shows center of rotation*/
+let debugMode = true
+
+// Visual Settings
+let rotationRounding = 1
