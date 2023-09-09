@@ -164,10 +164,24 @@ class PhysicsEntity extends Entity {
         let myUp = targetPosition.y+this.scaley/2
         for (let col of colliders) {
             if (myRight < col.boundl || myLeft > col.boundr || myUp < col.boundd || myDown > col.boundu) {
-                if (myDown > col.boundu && (myLeft <= col.boundr && myRight >= col.boundl)) {
+                if (myDown > col.boundu && (myLeft <= col.boundr && myRight >= col.boundl) && myUp > col.boundu) {
                     targetPosition.y = col.boundu-this.scaley/2
                     this.velocity[1] = 0
-                    console.log(this.velocity)
+                    console.log("down")
+                    //console.log(this.velocity)
+                }
+                if (myLeft < col.boundr && myRight > col.boundl) {
+                    if (myUp > col.boundd && myDown > col.boundu) {
+                        if (this.velocity < 0) {
+                            this.velocity[0] = 0
+                            targetPosition.x = col.boundr + this.scalex / 2
+                            console.log("left")
+                        } else {
+                            this.velocity[0] = 0
+                            targetPosition.x = col.boundl - this.scalex / 2
+                            console.log("right")
+                        }
+                    }
                 }
                 //this.velocity[0] = 0
                 //targetPosition.x = this.transform.position.x
