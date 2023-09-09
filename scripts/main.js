@@ -152,42 +152,32 @@ class PhysicsEntity extends Entity {
     constructor(image, tick, data, transform) {
         super(image, tick, data, transform)
         this.velocity = [0,0]
+        this.jump = 0
     }
     move(x,y) {
-        let targetPosition = {
-            "x":this.transform.position.x+x,
-            "y":this.transform.position.y+y,
-        }
-        let myLeft = targetPosition.x-this.scalex/2
-        let myRight = targetPosition.x+this.scalex/2
-        let myDown = targetPosition.y+this.scaley/2
-        let myUp = targetPosition.y+this.scaley/2
+        let oldPos = [this.transform.position.x, this.transform.position.y]
+        this.transform.position.x += x
+        let myLeft = this.transform.position.x-this.scalex/2
+        let myRight = this.transform.position.x+this.scalex/2
+        let myDown = this.transform.position.y+this.scaley/2
+        let myUp = this.transform.position.y-this.scaley/2
         for (let col of colliders) {
-            if (myRight < col.boundl || myLeft > col.boundr || myUp < col.boundd || myDown > col.boundu) {
-                if (myDown > col.boundu && (myLeft <= col.boundr && myRight >= col.boundl) && myUp > col.boundu) {
-                    targetPosition.y = col.boundu-this.scaley/2
-                    this.velocity[1] = 0
-                    console.log("down")
-                    //console.log(this.velocity)
-                }
-                if (myLeft < col.boundr && myRight > col.boundl) {
-                    if (myUp > col.boundd && myDown > col.boundu) {
-                        if (this.velocity < 0) {
-                            this.velocity[0] = 0
-                            targetPosition.x = col.boundr + this.scalex / 2
-                            console.log("left")
-                        } else {
-                            this.velocity[0] = 0
-                            targetPosition.x = col.boundl - this.scalex / 2
-                            console.log("right")
-                        }
-                    }
-                }
-                //this.velocity[0] = 0
-                //targetPosition.x = this.transform.position.x
+            if (myUp <= col.boundd && myDown >= col.boundu && myLeft <= col.boundr && myRight >= col.boundl) {
+                this.transform.position.x = oldPos[0]
+                this.velocity[0] = 0
             }
         }
-        this.transform.position = targetPosition
+        this.transform.position.y += y
+        myLeft = this.transform.position.x-this.scalex/2
+        myRight = this.transform.position.x+this.scalex/2
+        myDown = this.transform.position.y+this.scaley/2
+        myUp = this.transform.position.y-this.scaley/2
+        for (let col of colliders) {
+            if (myUp <= col.boundd && myDown >= col.boundu && myLeft <= col.boundr && myRight >= col.boundl) {
+                this.transform.position.y = oldPos[1]
+                this.velocity[1] = 0
+            }
+        }
     }
     update(dt) {
         this.tick(dt, this)
@@ -273,7 +263,7 @@ class Sound {
 let lasttime = 0
 
 let fps0 = 60
-let fps1 = 0
+let fps1 = 1
 function update(time) {
     let dt = (time-lasttime)/1000
     draw_context.fillStyle = "rgb(200,200,255)"
@@ -290,10 +280,14 @@ function update(time) {
         draw_context.fillStyle = "black"
         draw_context.fillText(Math.round(1/dt)+"fps av("+fps0/fps1+")",50,100)
         draw_context.fillText(keysdown,50,150)
-        if (fps1 >= 2) {
-            fps0 += Math.round(1 / dt)
-        }
-        fps1++
+    }
+    if (fps1 >= 2) {
+        fps0 += Math.round(1 / dt)
+    }
+    fps1++
+    if (fps1 >= 200) {
+        fps0 = fps0/fps1
+        fps1 = 1
     }
     
     lasttime = time

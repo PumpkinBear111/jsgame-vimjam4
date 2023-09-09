@@ -5,7 +5,7 @@ let colliders = []
 let ui = []
 
 /*Shows center of rotation*/
-let debugMode = false
+let debugMode = true
 
 // Visual Settings
 let rotationRounding = 1
