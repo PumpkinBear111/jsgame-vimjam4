@@ -20,8 +20,8 @@ class Graphic {
         } else {
             let a = this
             this.img.onload = function() {
-                a.scalex = a.img.width
-                a.scaley = a.img.height
+                a.scalex = a.img.width*defaultScaleX
+                a.scaley = a.img.height*defaultScaleX
             }
         }
     }
@@ -50,7 +50,7 @@ class Entity extends Graphic {
     constructor(image, tick, data, transform) {
         if (typeof transform.scale != "undefined") {
             if (typeof transform.scale.y == 'undefined') super(image, transform.scale.x, transform.scale.x)
-            else super(image, transform.scale.x, transform.scale.x)
+            else super(image, transform.scale.x, transform.scale.y)
         } else super(image)
         this.transform = {
             "position": {
@@ -266,7 +266,7 @@ let fps0 = 60
 let fps1 = 1
 function update(time) {
     let dt = (time-lasttime)/1000
-    draw_context.fillStyle = "rgb(200,200,255)"
+    draw_context.fillStyle = "#bcada6"
     draw_context.fillRect(0,0,width,height)
     
     for (let entity of entities) {
@@ -277,18 +277,15 @@ function update(time) {
     }
 
     if (debugMode) {
-        draw_context.fillStyle = "black"
-        draw_context.fillText(Math.round(1/dt)+"fps av("+fps0/fps1+")",50,100)
-        draw_context.fillText(keysdown,50,150)
+        //draw_context.fillStyle = "black"
+        //draw_context.fillText(Math.round(1/dt)+"fps av("+fps0/fps1+")",50,100)
+        //draw_context.fillText(keysdown,50,150)
+        console.log("av("+fps0/fps1+")")
     }
     if (fps1 >= 2) {
         fps0 += Math.round(1 / dt)
     }
     fps1++
-    if (fps1 >= 200) {
-        fps0 = fps0/fps1
-        fps1 = 1
-    }
     
     lasttime = time
     requestAnimationFrame(update)
