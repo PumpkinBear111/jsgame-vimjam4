@@ -28,11 +28,11 @@ function playerUpdate0(dt, self) {
         }
         if (key == Key.RIGHT) {
             self.velocity[0] -= 300*dt
-            if (self.velocity[0] < 0) self.velocity[0] -= 300*dt
+            if (self.velocity[0] > 0) self.velocity[0] -= 300*dt
             moving = true
         } else if (key == Key.LEFT) {
             self.velocity[0] += 300*dt
-            if (self.velocity[0] > 0) self.velocity[0] += 300*dt
+            if (self.velocity[0] < 0) self.velocity[0] += 300*dt
             moving = true
         }
     }
@@ -57,6 +57,24 @@ window.onload = function() {
         "position": {
             "x": width/2,
             "y": height-32
+        },
+    }))
+    colliders.push(new Solid("brick1x16.png",  {
+        "position": {
+            "x": 32,
+            "y": 8*64
+        },
+    }))
+    colliders.push(new Solid("brick1x16.png",  {
+        "position": {
+            "x": width-32,
+            "y": 8*64
+        },
+    }))
+    colliders.push(new Solid("brick3x1.png",  {
+        "position": {
+            "x": width/2,
+            "y": height-64-32
         },
     }))
 }

@@ -1,0 +1,2 @@
+Entities with rotation do not have cameraOffset
+Recent cameraoffset addition breaks the side walls for no apparent reason

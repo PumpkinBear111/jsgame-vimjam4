@@ -4,7 +4,8 @@ let draw_context = document.getElementById("gamecanvas")
 let width = draw_context.offsetWidth
 let height = draw_context.offsetHeight
 draw_context = draw_context.getContext("2d")
-draw_context.font = "30px Arial"
+draw_context.font = "40px Arial"
+draw_context.textAlign = "center"
 draw_context.imageSmoothingEnabled = false
 
 class Graphic {
@@ -12,16 +13,21 @@ class Graphic {
         this.img = new Image()
         this.img.src = "assets/images/" + name
         if (name.includes("/")) this.img.src = name
+        imagesLoaded[0]++
         if (scalex != undefined) {
             this.scalex = scalex
             if (scaley == undefined) {
                 this.scaley = scalex
             } else this.scaley = scaley
+            this.img.onload = function() {
+                imagesLoaded[1]++
+            }
         } else {
             let a = this
             this.img.onload = function() {
                 a.scalex = a.img.width*defaultScaleX
                 a.scaley = a.img.height*defaultScaleX
+                imagesLoaded[1]++
             }
         }
     }
@@ -40,10 +46,10 @@ class Graphic {
         if (!this.isLoaded()) {
             if (renderOnLoad) {
                 let data = [this.img, this.scalex, this.scaley]
-                this.img.onload = function() {draw_context.drawImage(data[0],x,y,data[1],data[2])}
+                this.img.onload = function() {draw_context.drawImage(data[0],x+cameraOffset[0],y+cameraOffset[1],data[1],data[2])}
             } else return 1
         }
-        draw_context.drawImage(this.img, x, y, this.scalex, this.scaley)
+        draw_context.drawImage(this.img, x+cameraOffset[0], y+cameraOffset[1], this.scalex, this.scaley)
     }
 }
 class Entity extends Graphic {
@@ -101,10 +107,10 @@ class Entity extends Graphic {
         if (this.transform.x-this.scalex/2 > width) return 1
         if (this.transform.y-this.scaley/2 < height) return 1
         if (Math.abs(this.transform.rotation)<rotationRounding) {
-            draw_context.drawImage(this.img, x-this.scalex/2, y-this.scaley/2, this.scalex, this.scaley)
+            draw_context.drawImage(this.img, x-this.scalex/2+cameraOffset[0], y+this.scaley/2+cameraOffset[1], this.scalex, this.scaley)
             if (debugMode) {
                 draw_context.fillStyle = "rgb(255,0,0)"
-                draw_context.fillRect(this.transform.position.x-1,this.transform.position.y-1,2,2)
+                draw_context.fillRect(this.transform.position.x-1+cameraOffset[0],this.transform.position.y-1+cameraOffset[1],2,2)
             } 
             return 1
         }
@@ -113,7 +119,7 @@ class Entity extends Graphic {
         }
         let t = this.transform
         draw_context.save()
-        draw_context.translate(t.position.x, t.position.y+t.scale.y/2)
+        draw_context.translate(t.position.x, t.position.y+t.scale.y/2) // Rotation does not currently support camera offset
         draw_context.rotate(
             Math.round((t.rotation)/rotationRounding)*rotationRounding*Math.PI/180.0)
         draw_context.translate(-t.position.x, -t.position.y-t.scale.y/2)
@@ -187,6 +193,7 @@ class PhysicsEntity extends Entity {
         this.draw(this.transform.position.x,this.transform.position.y)
     }
 }
+
 class GUI extends Entity {
     constructor(uitype, transform, data) {
         super("testimg.jpg", undefined, {}, transform)
@@ -221,6 +228,7 @@ const UiType = {
     LABEL: "text",
     IMG_LABEL: "icon"
 }
+
 class Sound {
     constructor(name) {
         this.sfx = new Audio()
@@ -264,10 +272,22 @@ let lasttime = 0
 
 let fps0 = 60
 let fps1 = 1
+let skipFrame = false
 function update(time) {
+    if (skipFrame == true) {
+        skipFrame = false
+        lasttime = time
+        requestAnimationFrame(update)
+        return
+    }
     let dt = (time-lasttime)/1000
     draw_context.fillStyle = "#bcada6"
     draw_context.fillRect(0,0,width,height)
+
+    if (imagesLoaded[0] != imagesLoaded[1]) {
+        draw_context.fillStyle = "black"
+        draw_context.fillText(`Loading Assets (${imagesLoaded[1]}/${imagesLoaded[0]})`,width/2,height/2+20)
+    }
     
     for (let entity of entities) {
         entity.update(dt)
@@ -286,7 +306,9 @@ function update(time) {
         fps0 += Math.round(1 / dt)
     }
     fps1++
-    
+
+    //cameraOffset[1] += 16*dt
+
     lasttime = time
     requestAnimationFrame(update)
 }
@@ -323,4 +345,8 @@ const Key = {
     LEFT: "left",
     DOWN: "down",
     RIGHT: "right",
+}
+
+window.onblur = function() {
+    skipFrame = true
 }
