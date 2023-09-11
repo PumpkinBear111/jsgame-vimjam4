@@ -1,5 +1,5 @@
 /*Shows center of rotation*/
-let debugMode = true
+let debugMode = false
 let imagesLoaded = [0,0]
 
 // Visual Settings
@@ -12,3 +12,4 @@ let entities = []
 let colliders = []
 let ui = []
 let cameraOffset = [0,0]
+cameraOffset[1] -= 64

@@ -31,7 +31,7 @@ window.onload = function() {
     colliders.push(new Solid("brick11x1.png",  {
         "position": {
             "x": width/2,
-            "y": height-32
+            "y": height
         },
     }))
     colliders.push(new Solid("brick1x16.png",  {
@@ -42,14 +42,14 @@ window.onload = function() {
     }))
     colliders.push(new Solid("brick1x16.png",  {
         "position": {
-            "x": width-32,
+            "x": width-64,
             "y": 8*64
         },
     }))
     colliders.push(new Solid("brick3x1.png",  {
         "position": {
             "x": width/2,
-            "y": height-64-32
+            "y": height-64
         },
     }))
 }

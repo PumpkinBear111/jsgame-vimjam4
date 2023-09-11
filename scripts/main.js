@@ -1,5 +1,3 @@
-let tmp
-
 let draw_context = document.getElementById("gamecanvas")
 let width = draw_context.offsetWidth
 let height = draw_context.offsetHeight
@@ -102,15 +100,15 @@ class Entity extends Graphic {
         }
     }
     draw(x,y) {
-        if (this.transform.x+this.scalex/2 < 0) return 1
-        if (this.transform.y+this.scaley/2 < 0) return 1
-        if (this.transform.x-this.scalex/2 > width) return 1
-        if (this.transform.y-this.scaley/2 < height) return 1
+        if (this.transform.x+this.scalex/2+cameraOffset[0] < 0) return 1
+        if (this.transform.y+this.scaley/2+cameraOffset[1] < 0) return 1
+        if (this.transform.x-this.scalex/2+cameraOffset[0] > width) return 1
+        if (this.transform.y-this.scaley/2+cameraOffset[1] < height) return 1
         if (Math.abs(this.transform.rotation)<rotationRounding) {
             draw_context.drawImage(this.img, x-this.scalex/2+cameraOffset[0], y+this.scaley/2+cameraOffset[1], this.scalex, this.scaley)
             if (debugMode) {
                 draw_context.fillStyle = "rgb(255,0,0)"
-                draw_context.fillRect(this.transform.position.x-1+cameraOffset[0],this.transform.position.y-1+cameraOffset[1],2,2)
+                draw_context.fillRect(this.transform.position.x-1+cameraOffset[0],this.transform.position.y+this.scaley-1+cameraOffset[1],2,2)
             } 
             return 1
         }
@@ -272,6 +270,7 @@ let lasttime = 0
 
 let fps0 = 60
 let fps1 = 1
+let gameRunSlow = 0
 let skipFrame = false
 function update(time) {
     if (skipFrame == true) {
@@ -283,6 +282,18 @@ function update(time) {
     let dt = (time-lasttime)/1000
     draw_context.fillStyle = "#bcada6"
     draw_context.fillRect(0,0,width,height)
+
+    if (dt >= .5) {
+        lasttime = time
+        gameRunSlow++
+        console.error("Game Slow, dt="+dt)
+        if (gameRunSlow < 21) requestAnimationFrame(update)
+        else {
+            draw_context.fillStyle = "black"
+            draw_context.fillText("Hi, game needs at least 2fps. Sorry.")
+        }
+        return
+    }
 
     if (imagesLoaded[0] != imagesLoaded[1]) {
         draw_context.fillStyle = "black"
