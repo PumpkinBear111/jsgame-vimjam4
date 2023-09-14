@@ -1,15 +1,25 @@
 /*Shows center of rotation*/
-let debugMode = false
-let imagesLoaded = [0,0]
+var debugMode = false
+var imagesLoaded = [0,0]
 
 // Visual Settings
-let rotationRounding = 1
-let defaultScaleX = 4
+var rotationRounding = 1
+var defaultScaleX = 4
+
+// Game Settings
+var globalTicks = []
 
 // Internal Game Config
-let keysdown = []
-let entities = []
-let colliders = []
-let ui = []
-let cameraOffset = [0,0]
-cameraOffset[1] -= 64
+{
+var keysdown = []
+var entities = []
+var colliders = []
+var ui = []
+var cameraOffset = [0,-64]
+var cameraTarget = cameraOffset
+var cameraChanging = false
+var levels = []
+var initStill = true
+var levelWalls = []
+var levelFloor = undefined
+}

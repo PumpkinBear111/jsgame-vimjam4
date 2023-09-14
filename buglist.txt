@@ -1,2 +1,17 @@
 Entities with rotation do not have cameraOffset
-Recent cameraoffset addition breaks the side walls for no apparent reason
+level0 has no ending
+
+---Improvements (if time): ---
+
+---Cannot Reproduce: ---
+Slight movement offset between two characters, floating point errors?
+
+---Done, somewhat: ---
+Make hitboxes more forgiving
+
+
+
+
+Performance Suggestions:
+Run with hardware acceleration on
+(Chromebook) Turn off energy saver in chrome settings
