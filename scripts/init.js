@@ -28,45 +28,56 @@ function playerUpdate(dt, self) {
         return
     }
     if (keysdown.includes(Key.DOWN)) {
-        self.data.savedPosition = {"x":self.gpos.x,"y":self.gpos.y}
-        if (self == playerRed) keysdown.splice(keysdown.indexOf(Key.DOWN),1)
-    
-    } else if (keysdown.includes(Key.RESET)) {
         self.velocity = [0,0]
         self.transform.position = {"x":self.data.savedPosition.x, "y":self.data.savedPosition.y}
-        self.data.savedPosition = {"x":self.data.initPos.x, "y": self.data.initPos.y}
-        if (self == playerRed) keysdown.splice(keysdown.indexOf(Key.RESET),1)
+        if (self == playerRed) keysdown.splice(keysdown.indexOf(Key.DOWN),1)
+    } else if (keysdown.includes(Key.RESET)) {
+        self.velocity = [0,0]
+        self.transform.position = {"x":self.data.initPos.x, "y":self.data.initPos.y}
+        if (self == playerRed) {
+            playerBlue.velocity = [0,0]
+            playerBlue.transform.position = {"x":playerBlue.data.initPos.x, "y":playerRed.data.initPos.y}
+            keysdown.splice(keysdown.indexOf(Key.RESET),1)
+            entities = [playerBlue, playerRed]
+            colliders = []
+            loadLevel(2)
+        }
     }
     self.velocity[0] *= 1-(dt*4)
 }
 
 var playerBlue
 var playerRed
+var checkpoint_blue
+var checkpoint_red
 window.onload = function() {
-    loadLevel(1)
+    checkpoint_blue = new Graphic("checkpoint_blue.png")
+    checkpoint_red = new Graphic("checkpoint_red.png")
+
+    loadLevel(2)
 
     playerBlue = new PhysicsEntity("char_blue.png", playerUpdate, {"moveInvert": 1, "initPos": {
-            "x": 200,
-            "y": height-64,
+            "x": 192-32,
+            "y": height-64-32,
         }, "savedPosition": {
-            "x": 200,
-            "y": height-64,
+            "x": 192-32,
+            "y": height-64-32,
         }}, {
         "position": {
-            "x": 200,
-            "y": height-64,
+            "x": 192-32,
+            "y": height-64-32,
         }
     })
     playerRed = new PhysicsEntity("char_red.png", playerUpdate, {"moveInvert": -1, "initPos": {
-            "x": width-200,
-            "y": height-64,
+            "x": width-192-32,
+            "y": height-64-32,
         }, "savedPosition": {
-            "x": width-200,
-            "y": height-64,
+            "x": width-192-32,
+            "y": height-64-32,
         }}, {
         "position": {
-            "x": width-200,
-            "y": height-64,
+            "x": width-192-32,
+            "y": height-64-32,
         }
     })
     

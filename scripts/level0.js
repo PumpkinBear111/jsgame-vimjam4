@@ -6,6 +6,9 @@ f - 11x1
 */
 let f = "floor"
 let _ = 0
+let l = "deco_lantern"
+let p = "deco_plant"
+let c = "checkpoint"
 
 levels.push([
 //             C

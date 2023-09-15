@@ -2,14 +2,15 @@ Entities with rotation do not have cameraOffset
 level0 has no ending
 
 ---Improvements (if time): ---
+stop loading every tile each time, waste of resources
 
 ---Cannot Reproduce: ---
 Slight movement offset between two characters, floating point errors?
 
 ---Done, somewhat: ---
+
+---Done:---
 Make hitboxes more forgiving
-
-
 
 
 Performance Suggestions:

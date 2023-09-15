@@ -17,7 +17,6 @@ var colliders = []
 var ui = []
 var cameraOffset = [0,-64]
 var cameraTarget = cameraOffset
-var cameraChanging = false
 var levels = []
 var initStill = true
 var levelWalls = []
