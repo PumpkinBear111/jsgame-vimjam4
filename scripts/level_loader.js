@@ -3,41 +3,41 @@ function loadLevel(index) {
     level.reverse()
     for (let y = 0; y < level.length; y++) {
         for (let x = 0; x < 11; x++)
-        if (level[y][x] != 0) {
-            let tile = level[y][x]
-            let transform = {
-                "position": {
-                    "x": x*64+loadTileOffset(tile)[0]+64,
-                    "y": height-y*64+loadTileOffset(tile)[1],
-                },
+            if (level[y][x] != 0) {
+                let tile = level[y][x]
+                let transform = {
+                    "position": {
+                        "x": (x+1)*64+loadTileOffset(tile)[0],
+                        "y": height-y*64+loadTileOffset(tile)[1],
+                    },
+                }
+                if (isDeco(tile)) colliders.push(new Entity(loadTile(tile), function() {}, {"active": false}, transform))
+                else if (tile == "checkpoint") {
+                    entities.push(new Entity(loadTile(tile), function(dt, self) {
+                        let myLeft = self.transform.position.x-self.scalex/2
+                        let myRight = self.transform.position.x+self.scalex/2
+                        let myDown = self.transform.position.y+self.scaley/2
+                        let myUp = self.transform.position.y-self.scaley/2
+                        if (myUp <= playerBlue.transform.position.y+playerBlue.scaley/2 &&
+                            myDown >= playerBlue.transform.position.y-playerBlue.scaley/2 &&
+                            myLeft <= playerBlue.transform.position.x+playerBlue.scalex/2 &&
+                            myRight >= playerBlue.transform.position.x-playerBlue.scalex/2) {
+                                self.img = checkpoint_blue.img
+                                playerBlue.data.savedPosition = self.transform.position
+                                self.tick = function() {}
+                        }
+                        if (myUp <= playerRed.transform.position.y+playerRed.scaley/2 &&
+                            myDown >= playerRed.transform.position.y-playerRed.scaley/2 &&
+                            myLeft <= playerRed.transform.position.x+playerRed.scalex/2 &&
+                            myRight >= playerRed.transform.position.x-playerRed.scalex/2) {
+                                self.img = checkpoint_red.img
+                                playerRed.data.savedPosition = self.transform.position
+                                self.tick = function() {}
+                        }
+                    }, {}, transform))
+                } else colliders.push(new Solid(loadTile(tile), transform))
+                if (tile == "floor") levelFloor = colliders[colliders.length-1]
             }
-            if (isDeco(tile)) colliders.push(new Entity(loadTile(tile), function() {}, {"active": false}, transform))
-            else if (tile == "checkpoint") {
-                entities.push(new Entity(loadTile(tile), function(dt, self) {
-                    let myLeft = self.transform.position.x-self.scalex/2
-                    let myRight = self.transform.position.x+self.scalex/2
-                    let myDown = self.transform.position.y+self.scaley/2
-                    let myUp = self.transform.position.y-self.scaley/2
-                    if (myUp <= playerBlue.transform.position.y+playerBlue.scaley/2 && 
-                        myDown >= playerBlue.transform.position.y-playerBlue.scaley/2 && 
-                        myLeft <= playerBlue.transform.position.x+playerBlue.scalex/2 && 
-                        myRight >= playerBlue.transform.position.x-playerBlue.scalex/2) {
-                        self.img = checkpoint_blue.img
-                        playerBlue.data.savedPosition = self.transform.position
-                        self.tick = function() {}
-                    }
-                    if (myUp <= playerRed.transform.position.y+playerRed.scaley/2 && 
-                        myDown >= playerRed.transform.position.y-playerRed.scaley/2 && 
-                        myLeft <= playerRed.transform.position.x+playerRed.scalex/2 && 
-                        myRight >= playerRed.transform.position.x-playerRed.scalex/2) {
-                        self.img = checkpoint_red.img
-                        playerRed.data.savedPosition = self.transform.position
-                        self.tick = function() {}
-                    }
-                }, {}, transform))
-            } else colliders.push(new Solid(loadTile(tile), transform))
-            if (tile == "floor") levelFloor = colliders[colliders.length-1]
-        }
     }
     levelWalls.push(new Solid("brick1x16.png", {
         "position": {
@@ -71,6 +71,7 @@ function loadTile(tile) {
         case 2: return "brick2x1.png"
         case 1: return "brick1x1.png"
     }
+    alert("this won't happen")
 }
 function loadTileOffset(tile) {
     switch(tile) {

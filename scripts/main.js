@@ -45,7 +45,7 @@ class Graphic {
             if (renderOnLoad) {
                 let data = [this.img, this.scalex, this.scaley]
                 this.img.onload = function() {draw_context.drawImage(data[0],x+cameraOffset[0],y+cameraOffset[1],data[1],data[2])}
-            } else return 1
+            } else return
         }
         draw_context.drawImage(this.img, x+cameraOffset[0], y+cameraOffset[1], this.scalex, this.scaley)
     }
@@ -53,8 +53,7 @@ class Graphic {
 class Entity extends Graphic {
     constructor(image, tick, data, transform) {
         if (typeof transform.scale != "undefined") {
-            if (typeof transform.scale.y == 'undefined') super(image, transform.scale.x, transform.scale.x)
-            else super(image, transform.scale.x, transform.scale.y)
+            super(image, transform.scale.x, (typeof transform.scale.y == 'undefined') ? transform.scale.x : transform.scale.y)
         } else super(image)
         this.transform = {
             "position": {
@@ -68,20 +67,13 @@ class Entity extends Graphic {
             }
         }
         if (typeof transform != "undefined") {
-            if (typeof transform.position.x != 'undefined') this.transform.position.x = transform.position.x
-            if (typeof transform.position.y != 'undefined') this.transform.position.y = transform.position.y
+            if (typeof transform.position != 'undefined') this.transform.position = transform.position
             if (typeof transform.scale != 'undefined') {
-                if (typeof transform.scale.y == 'undefined') {
-                    this.scalex = transform.scale.x
-                    this.scaley = transform.scale.x
-                } else {
-                    this.scalex = transform.scale.x
-                    this.scaley = transform.scale.y
-                }
+                this.scalex = transform.scale.x
+                if (typeof transform.scale.y == 'undefined') this.scaley = transform.scale.x
+                else this.scaley = transform.scale.y
             }
-            if (typeof transform.rotation != 'undefined') {
-                this.transform.rotation = transform.rotation
-            }
+            if (typeof transform.rotation != 'undefined') this.transform.rotation = transform.rotation
         }
         if (typeof data == "undefined") data = {}
         this.data = data
@@ -100,26 +92,23 @@ class Entity extends Graphic {
         }
     }
     draw(x,y) {
-        if (this.transform.x+this.scalex/2+cameraOffset[0] < 0) return 1
-        if (this.transform.y+this.scaley/2+cameraOffset[1] < 0) return 1
-        if (this.transform.x-this.scalex/2+cameraOffset[0] > width) return 1
-        if (this.transform.y-this.scaley/2+cameraOffset[1] < height) return 1
+        if (this.transform.x+this.scalex/2+cameraOffset[0] < 0) return
+        if (this.transform.y+this.scaley/2+cameraOffset[1] < 0) return
+        if (this.transform.x-this.scalex/2+cameraOffset[0] > width) return
+        if (this.transform.y-this.scaley/2+cameraOffset[1] < height) return
         if (Math.abs(this.transform.rotation)<rotationRounding) {
             draw_context.drawImage(this.img, x-this.scalex/2+cameraOffset[0], y-this.scaley/2+cameraOffset[1], this.scalex, this.scaley)
             if (debugMode) {
                 draw_context.fillStyle = "rgb(255,0,0)"
                 draw_context.fillRect(this.transform.position.x-1+cameraOffset[0],this.transform.position.y-1+cameraOffset[1],2,2)
             } 
-            return 1
+            return
         }
-        if (!this.isLoaded()) {
-            return 1
-        }
+        if (!this.isLoaded()) return
         let t = this.transform
         draw_context.save()
         draw_context.translate(t.position.x, t.position.y+t.scale.y/2) // Rotation does not currently support camera offset
-        draw_context.rotate(
-            Math.round((t.rotation)/rotationRounding)*rotationRounding*Math.PI/180.0)
+        draw_context.rotate(Math.round(t.rotation*rotationRounding)/rotationRounding*Math.PI/180.0)
         draw_context.translate(-t.position.x, -t.position.y-t.scale.y/2)
         draw_context.drawImage(this.img, x-this.scalex/2, y-this.scaley/2, this.scalex, this.scaley)
         draw_context.restore()
@@ -262,7 +251,7 @@ class Sound {
             if (playOnLoad) {
                 let data = this.sfx
                 this.sfx.oncanplaythrough = function() {data.play()}
-            } else return 1
+            } else return
         }
         this.sfx.play()
     }
@@ -272,14 +261,13 @@ class Sound {
             if (playOnLoad) {
                 let data = this.sfx
                 this.sfx.oncanplaythrough = function() {data.play()}
-            } else return 1
+            } else return
         }
         this.sfx.play()
     }
 }
 
 let lasttime = 0
-
 let fps0 = 60
 let fps1 = 1
 let gameRunSlow = 0

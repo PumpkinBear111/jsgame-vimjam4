@@ -1,11 +1,10 @@
 function playerUpdate(dt, self) {
     self.velocity[1] += 9.81*dt*200
     if (keysdown.includes(Key.JUMP)) {
-        myLeft = self.transform.position.x-self.scalex/2
-        myRight = self.transform.position.x+self.scalex/2
-        myDown = self.transform.position.y+self.scaley/2
-        myUp = self.transform.position.y-self.scaley/2
-        let canjump = true
+        let myLeft = self.transform.position.x-self.scalex/2
+        let myRight = self.transform.position.x+self.scalex/2
+        let myDown = self.transform.position.y+self.scaley/2
+        let myUp = self.transform.position.y-self.scaley/2
         for (let col of colliders) {
             if (myUp <= col.boundd && myDown >= col.boundu-5 && myLeft <= col.boundr-2 && myRight >= col.boundl+2) {
                 if ((Math.abs(myUp-col.boundd) >= 16)) {
