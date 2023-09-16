@@ -20,11 +20,11 @@ function playerUpdate(dt, self) {
     }
     if (keysdown.includes(Key.RIGHT) && keysdown.includes(Key.LEFT)) {}
     else if (keysdown.includes(Key.RIGHT)) {
-        self.velocity[0] += 300*dt*self.data.moveInvert
+        self.velocity[0] += 350*dt*self.data.moveInvert
         return
     } 
     else if (keysdown.includes(Key.LEFT)) {
-        self.velocity[0] -= 300*dt*self.data.moveInvert
+        self.velocity[0] -= 350*dt*self.data.moveInvert
         return
     }
     if (keysdown.includes(Key.DOWN)) {
@@ -36,7 +36,7 @@ function playerUpdate(dt, self) {
         reset()
         loadLevel(levelOn)
     }
-    self.velocity[0] *= 1-(dt*4)
+    self.velocity[0] *= 1-(dt*8)
 }
 
 function reset() {
@@ -61,7 +61,7 @@ window.onload = function() {
     checkpoint_blue = new Graphic("checkpoint_blue.png")
     checkpoint_red = new Graphic("checkpoint_red.png")
 
-    levelOn = 1
+    levelOn = 0
     loadLevel(levelOn)
 
     playerBlue = new PhysicsEntity("char_blue.png", playerUpdate, {"locked": false, "moveInvert": 1, "initPos": {
