@@ -31,18 +31,22 @@ function playerUpdate(dt, self) {
         self.transform.position = {"x":self.data.savedPosition.x, "y":self.data.savedPosition.y}
         if (self == playerRed) keysdown.splice(keysdown.indexOf(Key.DOWN),1)
     } else if (keysdown.includes(Key.RESET)) {
-        self.velocity = [0,0]
-        self.transform.position = {"x":self.data.initPos.x, "y":self.data.initPos.y}
-        if (self == playerRed) {
-            playerBlue.velocity = [0,0]
-            playerBlue.transform.position = {"x":playerBlue.data.initPos.x, "y":playerRed.data.initPos.y}
-            keysdown.splice(keysdown.indexOf(Key.RESET),1)
-            entities = [playerBlue, playerRed]
-            colliders = []
-            loadLevel(3)
-        }
+        reset()
+        loadLevel(levelOn)
     }
     self.velocity[0] *= 1-(dt*4)
+}
+
+function reset() {
+    playerRed.velocity = [0,0]
+    playerRed.transform.position = {"x":playerRed.data.initPos.x, "y":playerRed.data.initPos.y}
+    playerBlue.velocity = [0,0]
+    playerBlue.transform.position = {"x":playerBlue.data.initPos.x, "y":playerBlue.data.initPos.y}
+
+    keysdown.splice(keysdown.indexOf(Key.RESET),1)
+    entities = [playerBlue, playerRed]
+    colliders = []
+    ui = []
 }
 
 var playerBlue
@@ -53,7 +57,8 @@ window.onload = function() {
     checkpoint_blue = new Graphic("checkpoint_blue.png")
     checkpoint_red = new Graphic("checkpoint_red.png")
 
-    loadLevel(3)
+    levelOn = 0
+    loadLevel(levelOn)
 
     playerBlue = new PhysicsEntity("char_blue.png", playerUpdate, {"moveInvert": 1, "initPos": {
             "x": 192-32,

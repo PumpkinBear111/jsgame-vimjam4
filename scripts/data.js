@@ -20,4 +20,5 @@ var globalTicks = []
     var levelWalls = []
     var levelFloor = undefined
     var imagesLoaded = [0,0]
+    var levelOn = 0
 }

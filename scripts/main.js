@@ -2,9 +2,16 @@ let draw_context = document.getElementById("gamecanvas")
 let width = draw_context.offsetWidth
 let height = draw_context.offsetHeight
 draw_context = draw_context.getContext("2d")
-draw_context.font = "40px Arial"
-draw_context.textAlign = "center"
 draw_context.imageSmoothingEnabled = false
+
+let font = new FontFace('Handjet', 'url(assets/Handjet-Bold.ttf)')
+imagesLoaded[0]++
+font.load().then(function(f) {
+    document.fonts.add(f)
+    draw_context.font = "40px Handjet"
+    draw_context.textAlign = "center"
+    imagesLoaded[1]++
+})
 
 class Graphic {
     constructor(name,scalex,scaley) {
@@ -193,39 +200,34 @@ class Tick {
     }
 }
 
-class GUI extends Entity {
-    constructor(uitype, transform, data) {
-        super("testimg.jpg", undefined, {}, transform)
-        this.uitype = uitype
-        this.shown = true
-        switch(this.uitype) {
-            case(UiType.LABEL): setText(data); break;
-            case(UiType.IMG_LABEL): setIcon(data); break;
-        }
+class TextUI {
+    constructor(text, x, y) {
+        this.x = x
+        this.y = y
+        this.text = text
+        this.estWidth = text.length*16
+        this.transparancy = 1
     }
-    show() {
-        this.shown = true
-    }
-    hide() {
-        this.shown = false
-    }
-    setIcon(src) {
-        this.img.src = src
-    }
-    setOnClick(todo) {
-        this.clickevent = todo
-    }
-    setText(txt) {
-        this.text = txt
-    }
-    draw() {
-        
+    draw(dt) {
+        if ((Math.abs(playerRed.gpos.x-this.x) <= this.estWidth && Math.abs(playerRed.gpos.y+32-this.y+20)<100) ||
+           (Math.abs(playerBlue.gpos.x-this.x) <= this.estWidth && 64<playerBlue.gpos.y-this.y<-64))
+            this.transparancy = Math.max(this.transparancy-6*dt, .2)
+        else this.transparancy = Math.min(this.transparancy+6*dt, 1)
+        draw_context.fillStyle = `rgba(0,0,0,${this.transparancy})`
+        draw_context.fillText(this.text, this.x+cameraOffset[0], this.y+cameraOffset[1])
     }
 }
-const UiType = {
-    BUTTON: "btn",
-    LABEL: "text",
-    IMG_LABEL: "icon"
+class SmolText extends TextUI {
+    constructor(text, x, y) {
+        super(text,x,y)
+        this.estWidth = text.length*8
+    }
+    draw(dt) {
+        draw_context.font = "20px Handjet"
+        draw_context.fillStyle = 'black'
+        draw_context.fillText(this.text, this.x+cameraOffset[0], this.y+cameraOffset[1])
+        draw_context.font = "40px Handjet"
+    }
 }
 
 class Sound {
@@ -310,6 +312,9 @@ function update(time) {
     }
     for (let col of colliders) {
         col.draw(col.transform.position.x,col.transform.position.y)
+    }
+    for (let txt of ui) {
+        txt.draw(dt)
     }
     for (let atick of globalTicks) {
         atick.update(dt)
