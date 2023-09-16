@@ -371,6 +371,8 @@ function processKey(key) {
             return Key.DOWN
         case "r":
             return Key.RESET
+        case "b":
+            return Key.SKIP
     }
     return key
 }
@@ -387,7 +389,8 @@ const Key = {
     LEFT: "left",
     DOWN: "down",
     RIGHT: "right",
-    RESET: "reset"
+    RESET: "reset",
+    SKIP: "skip"
 }
 
 window.onblur = function() {

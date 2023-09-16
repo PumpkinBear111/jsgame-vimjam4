@@ -36,6 +36,12 @@ function playerUpdate(dt, self) {
         reset()
         loadLevel(levelOn)
     }
+    if (keysdown.includes(Key.SKIP)) {
+        reset()
+        levelOn = Math.min(levelOn+1, levels.length-1)
+        loadLevel(levelOn)
+        if (self == playerRed) keysdown.splice(keysdown.indexOf(Key.SKIP),1)
+    }
     self.velocity[0] *= 1-(dt*8)
 }
 
