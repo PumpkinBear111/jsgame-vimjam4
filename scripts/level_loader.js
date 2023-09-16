@@ -14,10 +14,10 @@ function loadLevel(index) {
                 if (isDeco(tile)) colliders.push(new Entity(loadTile(tile), function() {}, {"active": false}, transform))
                 else if (tile == "checkpoint") {
                     entities.push(new Entity(loadTile(tile), function(dt, self) {
-                        let myLeft = self.transform.position.x-self.scalex/2
-                        let myRight = self.transform.position.x+self.scalex/2
-                        let myDown = self.transform.position.y+self.scaley/2
-                        let myUp = self.transform.position.y-self.scaley/2
+                        let myLeft = self.transform.position.x-self.scalex/2+4
+                        let myRight = self.transform.position.x+self.scalex/2-4
+                        let myDown = self.transform.position.y+self.scaley/2-4
+                        let myUp = self.transform.position.y-self.scaley/2+4
                         if (myUp <= playerBlue.transform.position.y+playerBlue.scaley/2 &&
                             myDown >= playerBlue.transform.position.y-playerBlue.scaley/2 &&
                             myLeft <= playerBlue.transform.position.x+playerBlue.scalex/2 &&

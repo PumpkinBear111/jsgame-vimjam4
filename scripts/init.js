@@ -39,7 +39,7 @@ function playerUpdate(dt, self) {
             keysdown.splice(keysdown.indexOf(Key.RESET),1)
             entities = [playerBlue, playerRed]
             colliders = []
-            loadLevel(2)
+            loadLevel(3)
         }
     }
     self.velocity[0] *= 1-(dt*4)
@@ -53,7 +53,7 @@ window.onload = function() {
     checkpoint_blue = new Graphic("checkpoint_blue.png")
     checkpoint_red = new Graphic("checkpoint_red.png")
 
-    loadLevel(2)
+    loadLevel(3)
 
     playerBlue = new PhysicsEntity("char_blue.png", playerUpdate, {"moveInvert": 1, "initPos": {
             "x": 192-32,
@@ -68,14 +68,14 @@ window.onload = function() {
         }
     })
     playerRed = new PhysicsEntity("char_red.png", playerUpdate, {"moveInvert": -1, "initPos": {
-            "x": width-192-32,
+            "x": width-160,
             "y": height-64-32,
         }, "savedPosition": {
-            "x": width-192-32,
+            "x": width-160,
             "y": height-64-32,
         }}, {
         "position": {
-            "x": width-192-32,
+            "x": width-160,
             "y": height-64-32,
         }
     })
