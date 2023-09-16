@@ -3,6 +3,8 @@ let width = draw_context.offsetWidth
 let height = draw_context.offsetHeight
 draw_context = draw_context.getContext("2d")
 draw_context.imageSmoothingEnabled = false
+draw_context.strokeStyle = "white"
+draw_context.lineWidth = 4
 
 let font = new FontFace('Handjet', 'url(assets/Handjet-Bold.ttf)')
 imagesLoaded[0]++
@@ -185,10 +187,14 @@ class PhysicsEntity extends Entity {
     }
     update(dt) {
         this.tick(dt, this)
-        this.move(this.velocity[0]*dt,this.velocity[1]*dt)
-        if (this.scalex != this.transform.scale.x) this.transform.scale.x = this.scalex
-        if (this.scaley != this.transform.scale.y) this.transform.scaley = this.scaley
-        this.draw(this.transform.position.x,this.transform.position.y)
+        if (!this.data.locked) {
+            this.move(this.velocity[0] * dt, this.velocity[1] * dt)
+            if (this.scalex != this.transform.scale.x) this.transform.scale.x = this.scalex
+            if (this.scaley != this.transform.scale.y) this.transform.scaley = this.scaley
+            this.draw(this.transform.position.x, this.transform.position.y)
+        } else if (this == playerBlue) {
+            this.transform.position = playerRed.transform.position
+        } else this.transform.position = playerBlue.transform.position
     }
 }
 class Tick {
@@ -313,12 +319,17 @@ function update(time) {
     for (let col of colliders) {
         col.draw(col.transform.position.x,col.transform.position.y)
     }
+    draw_context.textAlign = "center"
     for (let txt of ui) {
         txt.draw(dt)
     }
     for (let atick of globalTicks) {
         atick.update(dt)
     }
+    draw_context.textAlign = "left"
+    draw_context.strokeText((levelOn+1)+"/"+(levels.length-1), 10,40)
+    draw_context.fillStyle = "black"
+    draw_context.fillText((levelOn+1)+"/"+(levels.length-1), 10,40)
 
     if (debugMode) {
         draw_context.fillStyle = "black"

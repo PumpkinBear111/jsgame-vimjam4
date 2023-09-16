@@ -45,7 +45,8 @@ function loadLevel(index) {
                             }
                         }
                     }, {}, transform))
-                } else if (tile == "bomb") {
+                }
+                else if (tile == "bomb") {
                     entities.push(new Entity(loadTile(tile), function (dt, self) {
                         let myLeft = self.transform.position.x - self.scalex / 2 + 12
                         let myRight = self.transform.position.x + self.scalex / 2 - 12
@@ -65,26 +66,32 @@ function loadLevel(index) {
                                 playerRed.transform.position = {"x":playerRed.data.savedPosition.x, "y":playerRed.data.savedPosition.y}
                         }
                     }, {}, transform))
-                } else if (tile == "end") {
+                }
+                else if (tile == "end") {
                     entities.push(new Entity(loadTile(tile), function (dt, self) {
                         let myLeft = self.transform.position.x - self.scalex / 2 + 4
                         let myRight = self.transform.position.x + self.scalex / 2 - 4
                         let myDown = self.transform.position.y + self.scaley / 2 - 4
                         let myUp = self.transform.position.y - self.scaley / 2 + 4
-                        if (myUp <= playerBlue.transform.position.y + playerBlue.scaley / 2 &&
+                        let touchingB = (myUp <= playerBlue.transform.position.y + playerBlue.scaley / 2 &&
                             myDown >= playerBlue.transform.position.y - playerBlue.scaley / 2 &&
                             myLeft <= playerBlue.transform.position.x + playerBlue.scalex / 2 &&
-                            myRight >= playerBlue.transform.position.x - playerBlue.scalex / 2 &&
-                            myUp <= playerRed.transform.position.y + playerRed.scaley / 2 &&
+                            myRight >= playerBlue.transform.position.x - playerBlue.scalex / 2)
+                        let touchingR = (myUp <= playerRed.transform.position.y + playerRed.scaley / 2 &&
                             myDown >= playerRed.transform.position.y - playerRed.scaley / 2 &&
                             myLeft <= playerRed.transform.position.x + playerRed.scalex / 2 &&
-                            myRight >= playerRed.transform.position.x - playerRed.scalex / 2) {
+                            myRight >= playerRed.transform.position.x - playerRed.scalex / 2)
+                        if (touchingB || touchingR) {
+                            if (touchingB && touchingR) {
                                 reset()
                                 levelOn++
                                 loadLevel(levelOn)
+                            } else if (touchingB) playerBlue.data.locked = true
+                            else playerRed.data.locked = true
                         }
                     }, {}, transform))
-                } else colliders.push(new Solid(loadTile(tile), transform))
+                }
+                else colliders.push(new Solid(loadTile(tile), transform))
                 if (tile == "floor") levelFloor = colliders[colliders.length-1]
             }
     }

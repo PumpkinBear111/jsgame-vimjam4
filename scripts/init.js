@@ -1,5 +1,6 @@
 function playerUpdate(dt, self) {
     self.velocity[1] += 9.81*dt*200
+    if (!keysdown.includes(Key.DOWN) && self.data.locked) return
     if (keysdown.includes(Key.JUMP)) {
         let myLeft = self.transform.position.x-self.scalex/2
         let myRight = self.transform.position.x+self.scalex/2
@@ -28,6 +29,7 @@ function playerUpdate(dt, self) {
     }
     if (keysdown.includes(Key.DOWN)) {
         self.velocity = [0,0]
+        self.data.locked = false
         self.transform.position = {"x":self.data.savedPosition.x, "y":self.data.savedPosition.y}
         if (self == playerRed) keysdown.splice(keysdown.indexOf(Key.DOWN),1)
     } else if (keysdown.includes(Key.RESET)) {
@@ -39,9 +41,11 @@ function playerUpdate(dt, self) {
 
 function reset() {
     playerRed.velocity = [0,0]
+    playerRed.data.locked = false
     playerRed.transform.position = {"x":playerRed.data.initPos.x, "y":playerRed.data.initPos.y}
     playerBlue.velocity = [0,0]
     playerBlue.transform.position = {"x":playerBlue.data.initPos.x, "y":playerBlue.data.initPos.y}
+    playerBlue.data.locked = false
 
     keysdown.splice(keysdown.indexOf(Key.RESET),1)
     entities = [playerBlue, playerRed]
@@ -57,10 +61,10 @@ window.onload = function() {
     checkpoint_blue = new Graphic("checkpoint_blue.png")
     checkpoint_red = new Graphic("checkpoint_red.png")
 
-    levelOn = 0
+    levelOn = 1
     loadLevel(levelOn)
 
-    playerBlue = new PhysicsEntity("char_blue.png", playerUpdate, {"moveInvert": 1, "initPos": {
+    playerBlue = new PhysicsEntity("char_blue.png", playerUpdate, {"locked": false, "moveInvert": 1, "initPos": {
             "x": 192-32,
             "y": height-64-32,
         }, "savedPosition": {
@@ -72,7 +76,7 @@ window.onload = function() {
             "y": height-64-32,
         }
     })
-    playerRed = new PhysicsEntity("char_red.png", playerUpdate, {"moveInvert": -1, "initPos": {
+    playerRed = new PhysicsEntity("char_red.png", playerUpdate, {"locked": false, "moveInvert": -1, "initPos": {
             "x": width-160,
             "y": height-64-32,
         }, "savedPosition": {
