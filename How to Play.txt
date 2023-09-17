@@ -1,0 +1,5 @@
+Double click on the index.html (hopefully should automatically open up the game in your default browser)
+Otherwise, drag the index.html from a file explorer to a "New Tab" on your browser
+
+If those don't work, you will have to type the file path manually into the search/address bar.
+Example: C:/Users/DefaultUser/Downloads/ReverseRascals/index.html

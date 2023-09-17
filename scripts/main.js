@@ -271,9 +271,9 @@ var music
 var musicPlaying = false
 document.onkeypress = function() {
     music = new SoundE("Rascal Theme.wav")
-    music.setAsMusic()
     music.sfx.oncanplaythrough = function() {
         if (!musicPlaying) {
+            music.setAsMusic()
             musicPlaying = true
             music.play()
             music.sfx.volume = 1
