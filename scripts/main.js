@@ -281,10 +281,8 @@ class SoundE {
 var music
 document.onkeypress = function() {
     music = new SoundE("Rascal Theme.wav")
-    imagesLoaded[0]++
     music.setAsMusic()
     music.sfx.oncanplaythrough = function() {
-        imagesLoaded[1]++
         music.play()
         music.sfx.volume = 1
     }
