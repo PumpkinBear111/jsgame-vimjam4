@@ -57,6 +57,7 @@ function reset() {
     entities = [playerBlue, playerRed]
     colliders = []
     ui = []
+    levelWalls = []
 }
 
 var playerBlue
@@ -66,6 +67,7 @@ var checkpoint_red
 window.onload = function() {
     checkpoint_blue = new Graphic("checkpoint_blue.png")
     checkpoint_red = new Graphic("checkpoint_red.png")
+    backgroundEntity = new Graphic("background_bricks.png")
 
     levelOn = 0
     loadLevel(levelOn)

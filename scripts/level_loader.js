@@ -2,6 +2,7 @@ let f = "floor"
 let _ = 0
 let l = "deco_lantern"
 let p = "deco_plant"
+let t = "deco_fishtank"
 let c = "checkpoint"
 let e = "end"
 let b = "bomb"
@@ -155,6 +156,7 @@ function isDeco(tile) {
 function loadTile(tile) {
     switch(tile) {
         case "deco_lantern": return "lantern.png"
+        case "deco_fishtank": return "fish.png"
         case "deco_plant": return "plant.png"
         case "floor": return "brick11x1.png"
         case "checkpoint": return "checkpoint_empty.png"

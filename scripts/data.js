@@ -21,4 +21,5 @@ var globalTicks = []
     var levelFloor = undefined
     var imagesLoaded = [0,0]
     var levelOn = 0
+    var backgroundEntity = undefined
 }

@@ -310,12 +310,15 @@ function update(time) {
         return
     }
 
+    backgroundEntity.draw(64, -128-cameraOffset[1]+cameraOffset[1]%64)
+
     if (dt >= .5) {
         lasttime = time
         gameRunSlow++
         console.error("Game Slow, dt="+dt)
         if (gameRunSlow < 21) requestAnimationFrame(update)
         else {
+            backgroundEntity.draw(0, -cameraOffset[1]%64)
             draw_context.fillStyle = "black"
             draw_context.fillText("Hi, game needs at least 2fps. Sorry.")
         }
