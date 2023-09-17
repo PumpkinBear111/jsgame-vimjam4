@@ -3,7 +3,6 @@ let width = draw_context.offsetWidth
 let height = draw_context.offsetHeight
 draw_context = draw_context.getContext("2d")
 draw_context.imageSmoothingEnabled = false
-draw_context.strokeStyle = "white"
 draw_context.lineWidth = 4
 
 let font = new FontFace('Handjet', 'url(assets/Handjet-Bold.ttf)')
@@ -235,6 +234,16 @@ class SmolText extends TextUI {
         draw_context.font = "40px Handjet"
     }
 }
+class TextHighlighted extends  TextUI {
+    constructor(text, x, y) {
+        super(text,x,y);
+    }
+    draw(dt) {
+        draw_context.strokeText(this.text, this.x+cameraOffset[0], this.y+cameraOffset[1])
+        draw_context.fillStyle = 'black'
+        draw_context.fillText(this.text, this.x+cameraOffset[0], this.y+cameraOffset[1])
+    }
+}
 
 class Sound {
     constructor(name) {
@@ -320,12 +329,14 @@ function update(time) {
         col.draw(col.transform.position.x,col.transform.position.y)
     }
     draw_context.textAlign = "center"
+    draw_context.strokeStyle = "white"
     for (let txt of ui) {
         txt.draw(dt)
     }
     for (let atick of globalTicks) {
         atick.update(dt)
     }
+    if (levelOn >= 3) draw_context.strokeStyle = "yellow"
     draw_context.textAlign = "left"
     draw_context.strokeText((levelOn+1)+"/"+(levels.length-1), 10,40)
     draw_context.fillStyle = "black"

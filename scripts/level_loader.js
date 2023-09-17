@@ -131,15 +131,19 @@ function loadLevel(index) {
                 "y": 203
             }
         }))
-        ui.push(new TextUI("Thanks for playing!", width/2, height/2))
-        ui.push(new TextUI("Made in 10 Days for VimJam 4", width/2, height/2+60))
+        ui.push(new TextHighlighted("Thanks for playing!", width/2, height/2))
+        ui.push(new TextHighlighted("Made in 10 Days for VimJam 4", width/2, height/2+60))
         ui.push(new SmolText("Focus: Checkpoints", width/2, height/2+85))
         ui.push(new SmolText("Theme: Cross Paths", width/2, height/2+105))
 
-        ui.push(new TextUI("Credits:", width/2, height/2+155))
+        ui.push(new TextHighlighted("Credits:", width/2, height/2+155))
         ui.push(new SmolText("Font: Handjet by Rosetta, David Březina", width/2, height/2+175))
         ui.push(new SmolText("Vimjam4 Logo: 8 Bits to Infinity", width/2, height/2+195))
         ui.push(new SmolText("Everything Else: PumpkinBear111 (aka Sloth)", width/2, height/2+215))
+
+        ui.push(new TextHighlighted("Close one. . .", width/2, height/2-1000))
+        ui.push(new SmolText("Now go check out some other Vimjam 4 entries", width/2, height/2-960))
+        ui.push(new SmolText(": )", width/2, height/2-920))
     }
 }
 
