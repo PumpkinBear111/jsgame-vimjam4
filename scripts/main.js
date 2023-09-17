@@ -245,7 +245,7 @@ class TextHighlighted extends  TextUI {
     }
 }
 
-class Sound {
+class SoundE {
     constructor(name) {
         this.sfx = new Audio()
         if (name.includes("/")) this.sfx.src = name
@@ -272,16 +272,23 @@ class Sound {
         }
         this.sfx.play()
     }
-    play(playOnLoad=true) {
+    play() {
         this.sfx.playbackRate = 1
-        if (!this.isLoaded()) {
-            if (playOnLoad) {
-                let data = this.sfx
-                this.sfx.oncanplaythrough = function() {data.play()}
-            } else return
-        }
         this.sfx.play()
     }
+}
+
+var music
+document.onkeypress = function() {
+    music = new SoundE("Rascal Theme.wav")
+    imagesLoaded[0]++
+    music.setAsMusic()
+    music.sfx.oncanplaythrough = function() {
+        imagesLoaded[1]++
+        music.play()
+        music.sfx.volume = 1
+    }
+    document.onkeypress = undefined
 }
 
 let lasttime = 0
@@ -298,11 +305,11 @@ function update(time) {
     }
     let dt = (time-lasttime)/1000
     lasttime = time
-    
-    draw_context.fillStyle = "#bcada6"
-    draw_context.fillRect(0,0,width,height)
 
     if (imagesLoaded[0] != imagesLoaded[1] || initStill) {
+        //draw_context.fillStyle = "#bcada6"
+        draw_context.fillStyle = "rgba(188, 173, 166, .1)"
+        draw_context.fillRect(0,0,width,height)
         draw_context.fillStyle = "black"
         draw_context.fillText(`Loading Assets (${imagesLoaded[1]}/${imagesLoaded[0]})`,width/2,height/2+20)
         lasttime = time
@@ -357,6 +364,12 @@ function update(time) {
     }
     fps1++
 
+    if (keysdown.includes(Key.MUTE)) {
+        keysdown.splice(keysdown.indexOf(processKey(Key.MUTE)),1)
+        muted = !muted
+        music.sfx.volume = muted ? 0 : 1
+    }
+
     //cameraOffset[1] += 16*dt
 
     requestAnimationFrame(update)
@@ -387,6 +400,8 @@ function processKey(key) {
             return Key.RESET
         case "b":
             return Key.SKIP
+        case "m":
+            return Key.MUTE
     }
     return key
 }
@@ -404,9 +419,11 @@ const Key = {
     DOWN: "down",
     RIGHT: "right",
     RESET: "reset",
-    SKIP: "skip"
+    SKIP: "skip",
+    "MUTE": "mute"
 }
 
 window.onblur = function() {
     skipFrame = true
+    keysdown = []
 }

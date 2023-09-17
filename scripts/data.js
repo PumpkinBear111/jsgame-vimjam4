@@ -22,4 +22,5 @@ var globalTicks = []
     var imagesLoaded = [0,0]
     var levelOn = 0
     var backgroundEntity = undefined
+    var muted = false
 }
