@@ -261,17 +261,6 @@ class SoundE {
     isLoaded() {
         return this.sfx.readyState === 4
     }
-    playVariate(playOnLoad=true) {
-        let variation = 1.1-Math.random()/5
-        this.sfx.playbackRate = variation
-        if (!this.isLoaded()) {
-            if (playOnLoad) {
-                let data = this.sfx
-                this.sfx.oncanplaythrough = function() {data.play()}
-            } else return
-        }
-        this.sfx.play()
-    }
     play() {
         this.sfx.playbackRate = 1
         this.sfx.play()
@@ -279,12 +268,16 @@ class SoundE {
 }
 
 var music
+var musicPlaying = false
 document.onkeypress = function() {
     music = new SoundE("Rascal Theme.wav")
     music.setAsMusic()
     music.sfx.oncanplaythrough = function() {
-        music.play()
-        music.sfx.volume = 1
+        if (!musicPlaying) {
+            musicPlaying = true
+            music.play()
+            music.sfx.volume = 1
+        }
     }
     document.onkeypress = undefined
 }
